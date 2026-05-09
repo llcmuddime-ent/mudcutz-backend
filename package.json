@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
     "build": "echo 'No build step required for backend'",
     "install": "npm ci --production"
   },
@@ -15,8 +14,5 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^6.2.2",
     "morgan": "^1.10.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
   }
 }
