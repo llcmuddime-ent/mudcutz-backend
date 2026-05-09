@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "cd backend && node app.js",
-    "install": "cd backend && npm install --production",
-    "build": "cd backend && npm ci --production",
-    "dev": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build": "echo 'No build step required for backend'",
+    "install": "npm ci --production"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -14,7 +14,9 @@
     "express": "^4.17.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^6.2.2",
-    "morgan": "^1.10.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.14"
   }
 }
