@@ -1,0 +1,20 @@
+{
+  "name": "mudcutz-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "cd backend && node app.js",
+    "install": "cd backend && npm install --production",
+    "build": "cd backend && npm ci --production",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.3.1",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^6.2.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+    <body>
+
+        <%- include('../partials/nav.ejs') %>
+
+            <div class="details">
+                <h2> <%= blog.title%> </h2>
+                <div class="content">
+                    <p> <%= blog.body %> </p>
+                    <!-- <span><%= blog.timer%></span> -->
+                </div>
+                <div class="d_btns">
+                    <a  class='update b' href="/blogs/<%= blog._id %>/update">Edit</a>
+                    <a class="delete" data-doc="<%= blog._id %>">
+                        <img src="../icons/trashcan.svg" alt="delete">
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="comment-space">
+                <form action="/blogs/<%=blog._id %>" method="post" class="post-comment">
+                    <label for="" class="comment-span">Leave a comment </label><br><br>
+
+                    <label for="" class="comment-username">Username: </label>
+                    <input type="text" name="username" placeholder="Username" required>
+
+                    <label for="" class="comment-email">Email: </label>
+                    <input type="email" name="email" placeholder="Email" required>
+
+                    <label for="" class="comment-text">Comment here: </label>
+                    <textarea name="comment" name="comment" class="comment-input"></textarea>
+                    <button class="b post-btn" data-id = '<%=blog._id %>'>Post Comment</button>
+
+                </form>
+
+                <div class="comments">
+                    <h2>Recent Comments</h2>
+                    <%for(let comment of blog.comments){%>
+                    <div class="user-comment">
+                        <span class="user-names"><%= comment.username%></span>
+                        <span class="time-sent"><%= comment.time%></span><br>
+                        <span class="comment-body">
+                            <%= comment.comment%>
+                        </span>
+                    </div>
+                    <%}%>
+                </div>
+            </div>
+
+            <%- include('../partials/footer.ejs') %>
+
+            <script>
+                //Delete functionality
+                const trashcan = document.querySelector('a.delete');
+
+                trashcan.addEventListener('click', (e)=>{
+                    const endPoint = `/blogs/${trashcan.dataset.doc}`;
+
+                    fetch(endPoint, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => window.location.href = data.redirect)
+                    .catch(err => console.log(err))
+
+                })
+            </script>
+    </body>
+
+</html>
