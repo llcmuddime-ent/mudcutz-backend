@@ -10,6 +10,7 @@ import Payment from '../models/payment.js';
 export const booking_index = async (req, res) => {
   try {
     const { status, barber, customer, startDate, endDate } = req.query;
+    const user = req.user; // From auth middleware
 
     let query = {};
     if (status) query.status = status.toLowerCase();
@@ -20,8 +21,9 @@ export const booking_index = async (req, res) => {
       if (startDate) query.start_time.$gte = new Date(startDate);
       if (endDate) query.start_time.$lte = new Date(endDate);
     }
+   
 
-    const bookings = await Booking.find(query)
+    const queryBookings = await Booking.find(query)
       .populate('customer', 'fullname email phone')
       .populate({
         path: 'barber',
@@ -30,9 +32,30 @@ export const booking_index = async (req, res) => {
       .populate('services', 'type duration price')   // Updated to plural
       .sort({ start_time: 1 });
 
+
+    let bookings = [];
+    // Role-based filtering
+    if (user.role === 'admin') {
+      bookings = queryBookings;
+    } 
+    else if (user.role === 'employee' || user.role === 'barber') {
+      queryBookings.map(booking => {
+      if (user.role == 'employee' && booking.barber.user._id.toString() === user._id.toString()) {
+        bookings.push(booking);
+      }
+    }).filter(Boolean);
+    } 
+    else {
+      // Other roles - return empty
+      return res.json({ success: true, count: 0, data: [] });
+    }
+
+    
+
     res.status(200).json({
       success: true,
       count: bookings.length,
+      user: { id: user.firstname, role: user.role },
       data: bookings
     });
   } catch (error) {

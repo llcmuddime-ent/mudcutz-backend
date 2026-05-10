@@ -30,7 +30,7 @@ app.set('view engine', 'ejs');
 // CORS
 app.use((req, res, next) => {
   const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com', 'https://www.yourdomain.com']
+    ? ['https://yourdomain.com', 'http://localhost:4173']
     : ['http://localhost:5173'];
 
   const origin = req.headers.origin;
