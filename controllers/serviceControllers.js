@@ -31,7 +31,7 @@ export const service_create = async (req, res) => {
       price,
       base_price,
       is_active,
-      barber,
+      barber: barber && barber.trim() ? barber : undefined,
       duration,
     });
 
@@ -51,9 +51,15 @@ export const service_update = async (req, res) => {
   try {
     const id = req.params.id;
 
+    // Clean up barber field if empty
+    const updateData = { ...req.body };
+    if (updateData.barber && !updateData.barber.trim()) {
+      updateData.barber = undefined;
+    }
+
     const updatedService = await Service.findByIdAndUpdate(
       id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 
