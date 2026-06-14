@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import config from './config/index.js';
@@ -86,17 +87,30 @@ app.use(config.BASE_URL + '/services', serviceRoutes);
 app.use(config.BASE_URL + '/reports', reportRoutes);
 
 // ======================
-// PRODUCTION: Serve React Frontend
+// Frontend static serving (opt-in for single-repo deployments)
 // ======================
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+const SERVE_FRONTEND = process.env.SERVE_FRONTEND === 'true';
+const frontendDistPath = process.env.FRONTEND_DIST_PATH
+  ? path.resolve(process.env.FRONTEND_DIST_PATH)
+  : path.join(__dirname, './views/blogs'); // Default to 'views' if not specified
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+if (SERVE_FRONTEND && fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+
+  // Frontend fallback for client-side routing (only when serving frontend)
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith(config.BASE_URL)) return next();
+    return res.sendFile(path.join(frontendDistPath, 'index.ejs'));
   });
 } else {
-  // Development static files
+  // Development static files or backend-only deployments
   app.use(express.static(path.join(__dirname, 'public')));
+
+  // If not serving the frontend, ensure API routes still work and give a clear message for browser requests
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith(config.BASE_URL)) return next();
+    return res.status(404).send('Frontend is deployed separately. Please deploy the frontend and set FRONTEND_URL in backend CORS config.');
+  });
 }
 
 
