@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import config from './config/index.js';
 
@@ -27,28 +28,38 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 
-// CORS
+
+const allowedOrigins = [
+  'http://localhost:4173',
+  'http://localhost:5173',
+  config.FRONTEND_URL
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
+
+app.options('*', cors());
+
+// Logging
 app.use((req, res, next) => {
-  const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com', 'http://localhost:4173']
-    : ['http://localhost:5173'];
-
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('Origin:', req.headers.origin);
+  console.log(req.method, req.originalUrl);
   next();
 });
 
-// Logging
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 
@@ -94,18 +105,25 @@ app.get('/', (req, res) => {
     res.redirect(config.BASE_URL);
     console.log(`Redirecting to API base URL ${config.BASE_URL}`);
 });
+app.use((req, res, next) => {
+  console.log('Origin:', req.headers.origin);
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  next();
+});
 
 
 // ======================
 // DATABASE CONNECTION
 // ======================
-const DB_URI = process.env.NODE_ENV === 'production' 
-  ? config.DB_URI_PROD 
-  : config.DB_URI_DEV;
 
 mongoose.set('strictQuery', true);
 
-mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+if (!config.DB_URL) {
+  console.error('❌ MongoDB connection string missing. Set DB_URL or DB_URI in .env.');
+  process.exit(1);
+}
+
+mongoose.connect(config.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(config.PORT, config.DB_HOST, () => {
       console.log(`🚀 Server running on http://localhost:${config.PORT}`);

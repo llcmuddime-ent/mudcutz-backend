@@ -4,11 +4,11 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "build": "echo 'No build step required for backend'",
-    "install": "npm ci --production"
+    "build": "echo 'No build step required for backend'"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^4.17.2",
     "jsonwebtoken": "^9.0.3",
