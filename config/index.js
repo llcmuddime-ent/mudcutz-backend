@@ -11,7 +11,8 @@ const config = {
   PORT: process.env.PORT || 3000,
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_URL: process.env.DB_URL,
-  BASE_URL: process.env.BASE_URL || '/api/v1'
+  BASE_URL: process.env.BASE_URL || '/api/v1',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
 };
 
 export default config;
