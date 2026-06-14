@@ -24,6 +24,7 @@ const serviceSchema = new Schema({
       'SCALP TREATMENT',
       'HAIR WASH',
       'SHAVE',
+      'CUSTOM',
       'OTHER'
     ],
     maxlength: [60, 'Service type cannot exceed 60 characters']
