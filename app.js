@@ -32,17 +32,28 @@ app.set('view engine', 'ejs');
 const allowedOrigins = [
   'http://localhost:4173',
   'http://localhost:5173',
-  config.FRONTEND_URL
+  config.FRONTEND_URL // Remove trailing slash if present
 ];
+
+const normalizeOrigin = (url) =>
+  url?.replace(/\/$/, '').toLowerCase();
 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      const isAllowed = allowedOrigins.some(
+        (allowed) =>
+          normalizeOrigin(allowed) === normalizedOrigin
+      );
+
+      if (isAllowed) {
         return callback(null, true);
       }
+      console.error('Blocked Origin:', origin);
 
       return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
