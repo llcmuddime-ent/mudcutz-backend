@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "build": "echo 'No build step required for backend'"
+    "install": "npm ci --production"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
